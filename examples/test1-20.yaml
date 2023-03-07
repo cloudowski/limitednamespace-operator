@@ -1,0 +1,8 @@
+apiVersion: cloudowski.com/v1alpha1
+kind: LimitedNamespace
+metadata:
+  name: test1
+  labels:
+    foo: bar
+spec:
+  expiration: 20

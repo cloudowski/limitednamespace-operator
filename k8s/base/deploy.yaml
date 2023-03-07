@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lns-operator
+  namespace: kube-system
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: lns-operator
+  template:
+    metadata:
+      labels:
+        app: lns-operator
+    spec:
+      serviceAccountName: lns-operator
+      containers:
+        - name: lns-operator
+          image: lns-operator
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /healthz
+            initialDelaySeconds: 0
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /healthz
+            periodSeconds: 30

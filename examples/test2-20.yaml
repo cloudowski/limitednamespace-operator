@@ -1,0 +1,7 @@
+apiVersion: cloudowski.com/v1alpha1
+kind: LimitedNamespace
+metadata:
+  name: test2
+spec:
+  expiration: 20
+  purge: true

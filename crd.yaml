@@ -1,0 +1,66 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: limitednamespaces.cloudowski.com
+spec:
+  scope: Cluster
+  group: cloudowski.com
+  names:
+    kind: LimitedNamespace
+    plural: limitednamespaces
+    singular: limitednamespaces
+    shortNames:
+      - lns
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          description: A LimitedNamespace is a resource that is used to create a Namespace object with auto-deletionn capability
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              description: Definition of a LimitedNamespace resource that creates a child namespace
+              type: object
+              required:
+                - expiration
+              properties:
+                expiration:
+                  description: Number of seconds since creation of the child namespace object before it is consideredd as expired and is removewd by the controller.
+                  type: integer
+                  minimum: 5
+                purge:
+                  description: >
+                    Mark whether the parent object should be removed after the removal of the child namespace.
+                    If set to false the object will remain until it's explicitlty removed.
+                  type: boolean
+                  default: false
+            status:
+              type: object
+              properties:
+                managed-namespace:
+                  type: object
+                  properties:
+                    expiration-ts:
+                      type: integer
+                      default:
+                    expiration-dt:
+                      type: string
+                      default:
+              x-kubernetes-preserve-unknown-fields: true
+      additionalPrinterColumns:
+        - name: MARKED
+          type: boolean
+          description: Whether the child namespace has already been marked to be deleted
+          jsonPath: .status.nspurger.marked-for-deletion
+        - name: EXPIRATION
+          type: string
+          description: The UTC time and date when the namespace is to be deleted
+          jsonPath: .status.managed-namespace.expiration-dt
+        - name: PURGE
+          type: boolean
+          description: Whether to delete the CR object as well after the namespace has been deleted
+          jsonPath: .spec.purge
